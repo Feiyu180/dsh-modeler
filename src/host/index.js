@@ -17,6 +17,7 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { spawn } from 'node:child_process'
+import { fileURLToPath } from 'node:url'
 
 import { meshStats, projectViews, toOBJ, toSTLBinary, toSTLAscii, toGLB, toGLTF, toMeshJSON } from '../core/geometry.js'
 import { describeProviders, probeEnvironment, recommend, INSTALL_PLANS, listInstallPlans } from './ai-models.js'
@@ -576,19 +577,34 @@ function sendJson(res, code, obj) {
 // 走的不是 node 原生 child_process 的默认姿势，而是显式 spawn + Promise 包装：
 // 面板要看到"跑到哪一步了"，所以 stdout/stderr 逐行回吐进 job.lines。
 
+// 包内自带的胶水脚本（tools/ai/）：脚本随插件一起发布，所以**优先用包内那份**；
+// 后面的绝对路径只是回退 —— 老环境里脚本还散落在数据目录时仍能照旧跑。
+const AI_SCRIPT_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'tools', 'ai')
+
+function aiScript(name, legacy) {
+  const bundled = path.join(AI_SCRIPT_DIR, name)
+  try { if (fs.existsSync(bundled)) return bundled } catch { /* 忽略 */ }
+  return legacy
+}
+
+/** 包内脚本清单（环境清单里要逐项展示） */
+const AI_SCRIPT_NAMES = [
+  'hunyuan3d-run.py', 'hunyuan3d-mv-run.py', 'zero123-views-cli.py', 'fastdl.py', 'glb-to-json.py',
+]
+
 const TRIPOSR = {
   python: 'D:\\dsh-data\\dsh-triposr\\python311\\python.exe',
   cwd: 'D:\\dsh-data\\dsh-triposr\\TripoSR-main',
   weights: 'D:\\dsh-data\\dsh-triposr\\weights',
   dinoConfig: 'D:\\dsh-data\\dsh-triposr\\weights\\dino-vitb16\\config.json',
-  glbToJson: 'D:\\dsh-data\\dsh-triposr\\glb-to-json.py',
+  glbToJson: aiScript('glb-to-json.py', 'D:\\dsh-data\\dsh-triposr\\glb-to-json.py'),
 }
 
 // Zero123 多视角生成。⚠ 必须用 **ComfyUI 的嵌入式 Python**，因为脚本要 import comfy
 // （我们复用 ComfyUI 自带的 Stable Zero123 节点实现，而不是自己重写推理）。
 const ZERO123 = {
   python: 'D:\\dsh-data\\ComfyUI_windows_portable\\python_embeded\\python.exe',
-  script: 'D:\\dsh-data\\dsh-triposr\\zero123-views-cli.py',
+  script: aiScript('zero123-views-cli.py', 'D:\\dsh-data\\dsh-triposr\\zero123-views-cli.py'),
   ckpt: 'D:\\dsh-data\\ComfyUI_windows_portable\\ComfyUI\\models\\checkpoints\\stable_zero123.ckpt',
   weightsDir: 'D:\\dsh-data\\dsh-triposr\\weights',
 }
@@ -598,9 +614,9 @@ const ZERO123 = {
 // 和 DINOv2-giant 编码器，没有自己实现推理。
 const HUNYUAN = {
   python: 'D:\\dsh-data\\ComfyUI_windows_portable\\python_embeded\\python.exe',
-  script: 'D:\\dsh-data\\dsh-triposr\\hunyuan3d-run.py',
+  script: aiScript('hunyuan3d-run.py', 'D:\\dsh-data\\dsh-triposr\\hunyuan3d-run.py'),
   // 多视图版是**同一个脚本结构的另一个入口**：只换 DiT 权重 + 条件构造方式
-  scriptMv: 'D:\\dsh-data\\dsh-triposr\\hunyuan3d-mv-run.py',
+  scriptMv: aiScript('hunyuan3d-mv-run.py', 'D:\\dsh-data\\dsh-triposr\\hunyuan3d-mv-run.py'),
   dir: 'D:\\dsh-data\\dsh-triposr\\hunyuan-full',
   ditMv: 'D:\\dsh-data\\dsh-triposr\\hunyuan-full\\dit-mv-fp16.safetensors',
 }
@@ -612,9 +628,8 @@ const COMFY_ROOT = 'D:\\dsh-data\\ComfyUI_windows_portable\\ComfyUI'
 // 用 TripoSR 那个独立环境是因为它一定在。
 const DOWNLOADER = {
   python: 'D:\\dsh-data\\dsh-triposr\\python311\\python.exe',
-  script: 'D:\\dsh-data\\dsh-triposr\\fastdl.py',
+  script: aiScript('fastdl.py', 'D:\\dsh-data\\dsh-triposr\\fastdl.py'),
 }
-
 /** 交给 ai-models.js 的路径配置（provider 可用性检测 + 环境探测都用它） */
 function providerPaths() {
   return {
@@ -623,6 +638,55 @@ function providerPaths() {
     hunyuan: HUNYUAN,
     comfyRoot: COMFY_ROOT,
   }
+
+}
+/**
+ * 运行环境清单：AI 后端要跑起来需要的**非权重**前置条件。
+ * 一键安装只下载权重；缺这些前置时下完也跑不了，所以面板要先把它们摆出来。
+ */
+const AI_SCRIPT_REQUIRED = [...AI_SCRIPT_NAMES, 'patch-triposr.py']
+
+function fileExists(p) {
+  try { return !!(p && fs.existsSync(p)) } catch { return false }
+}
+
+function envChecklist() {
+  const t = TRIPOSR
+  const h = HUNYUAN
+  const scriptMissing = AI_SCRIPT_REQUIRED.filter((n) => !fileExists(path.join(AI_SCRIPT_DIR, n)))
+  const provs = describeProviders(providerPaths())
+  const anyWeights = provs.some((p) => p.available)
+  const items = [
+    {
+      id: 'scripts',
+      label: '胶水脚本（包内 tools/ai）',
+      ok: scriptMissing.length === 0,
+      detail: scriptMissing.length ? `缺 ${scriptMissing.join(' / ')}` : AI_SCRIPT_DIR,
+      why: '各模型的调用脚本，随插件一起发布',
+    },
+    {
+      id: 'comfy',
+      label: 'ComfyUI（Hunyuan3D / Zero123 的推理宿主）',
+      ok: fileExists(h.python) && fileExists(COMFY_ROOT),
+      detail: fileExists(h.python) ? COMFY_ROOT : `缺 ${h.python}`,
+      why: '脚本要 import comfy 与 comfy_extras，复用它的 ShapeVAE / DINOv2 实现',
+    },
+    {
+      id: 'triposr',
+      label: 'TripoSR 独立 Python 环境',
+      ok: fileExists(t.python) && fileExists(t.cwd),
+      detail: fileExists(t.python) ? t.python : `缺 ${t.python}`,
+      why: 'Python 3.11 + torch，TripoSR 单图模型用',
+    },
+    {
+      id: 'weights',
+      label: '模型权重',
+      ok: anyWeights,
+      detail: anyWeights ? '至少一个后端已就绪' : '都还没装（可在下面一键安装）',
+      why: '权重可以用一键安装下载，不需要手动找',
+    },
+  ]
+  return { ok: items.every((i) => i.ok), items, scriptsDir: AI_SCRIPT_DIR }
 }
 
 function runProcess(exe, args, { cwd, env, onLine, timeoutMs = 15 * 60 * 1000 } = {}) {
@@ -799,6 +863,24 @@ async function handleApi(req, res) {
         environment: env,
         recommendations: recommend(env, provs),
         plans: listInstallPlans(),
+        checklist: envChecklist(),
+      })
+      return
+    }
+
+    // 运行环境安装向导：返回运行时清单 + 两条可直接复制的命令。
+    // 脚本本体随包发布（tools/setup-env.ps1），这里只负责把它拼成一条命令 ——
+    // 真正的下载/pip 都发生在用户自己的终端里，进度和失败原因都看得见。
+    if ((sub === '/setup-env' || sub === '/setup-env/') && req.method === 'GET') {
+      const script = path.join(AI_SCRIPT_DIR, '..', 'setup-env.ps1')
+      const quoted = `"${script}"`
+      sendJson(res, 200, {
+        ok: true,
+        checklist: envChecklist(),
+        script,
+        scriptExists: fileExists(script),
+        check: `powershell -NoProfile -ExecutionPolicy Bypass -File ${quoted} -Check`,
+        apply: `powershell -NoProfile -ExecutionPolicy Bypass -File ${quoted} -Apply`,
       })
       return
     }

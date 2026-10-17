@@ -483,6 +483,22 @@ export function createModelerPanel(React, hooks = {}) {
       }
     }, [])
 
+    // 运行环境安装向导：清单已在 /environment 里，**命令点按钮才去要**（含绝对路径，不预取）。
+    // 与"一键安装"的分工：这里解决运行时（Python / ComfyUI / 脚本），那边只下权重。
+    const [setupInfo, setSetupInfo] = useState(null)
+    const [setupBusy, setSetupBusy] = useState(false)
+    const loadSetupInfo = useCallback(async () => {
+      setSetupBusy(true)
+      try {
+        const r = await fetch(`${API}/setup-env`)
+        const j = await r.json()
+        if (!j.ok) throw new Error(j.error || '拿不到安装命令')
+        setSetupInfo(j)
+      } catch (e) {
+        setError(`生成安装命令失败：${e.message || e}（host 是否还没重启？）`)
+      } finally { setSetupBusy(false) }
+    }, [])
+
     // 切到多视图模式时自动探一次环境：它的按钮要不要禁用，取决于本机显存（见 mvVramTooSmall）。
     // 不探的话用户第一次进这个模式会看到一个"可用"的按钮 —— 而它在这台机器上不该被点。
     // ⚠ 这个 effect 必须放在 `aiInput` 声明**之后**（我第一次写在前面，直接 TDZ 报错
@@ -1642,6 +1658,63 @@ export function createModelerPanel(React, hooks = {}) {
                           + `磁盘  ${env.environment.disks.map((d) => `${d.drive}: ${d.freeGB}G`).join(' · ')}\n`
                           + `ComfyUI  ${env.environment.comfyui.exists ? `${env.environment.comfyui.capabilities.length} 项 3D 能力` : '未找到'}`,
                         ),
+                        // ---- 运行环境（非权重前置）：缺这些的话，权重装好了也跑不了 ----
+                        env.checklist
+                          ? el('div', { style: { marginTop: 10 } },
+                              el('div', { style: { fontSize: 12, fontWeight: 600, marginBottom: 4 } },
+                                '运行环境',
+                                el('span', { style: { fontWeight: 400, opacity: 0.55, marginLeft: 6 } },
+                                  env.checklist.ok ? '就绪' : '缺前置条件'),
+                              ),
+                              el('div', { style: { display: 'flex', flexDirection: 'column', gap: 3 } },
+                                env.checklist.items.map((it) => el('div', {
+                                  key: it.id, style: { fontSize: 11.5, lineHeight: 1.6 },
+                                },
+                                  el('span', { style: { color: it.ok ? '#8ee6a8' : '#ff9c9c', marginRight: 6 } },
+                                    it.ok ? '✓' : '✗'),
+                                  el('strong', null, it.label),
+                                  it.ok ? null : el('span', { style: { opacity: 0.75 } }, ` — ${it.detail}`),
+                                  el('span', {
+                                    title: it.why, style: { opacity: 0.45, cursor: 'help', marginLeft: 4 },
+                                  }, '?'),
+                                )),
+                              ),
+                              el('div', { style: { marginTop: 5, fontSize: 11, opacity: 0.65 } },
+                                env.checklist.ok
+                                  ? '运行环境齐了；权重在下面按模型安装即可。'
+                                  : '一键安装只下载权重，不含上面这些运行时 —— 先备环境，再装权重。'),
+                              !env.checklist.ok
+                                ? el('button', {
+                                    style: { ...styles.btn, marginTop: 6, padding: '2px 10px', fontSize: 11 },
+                                    disabled: setupBusy,
+                                    title: '生成一条可直接粘到终端的检查命令；加 -Apply 只做脚本/源码/权重这些安全步骤',
+                                    onClick: loadSetupInfo,
+                                  }, setupBusy ? '获取中…' : '生成安装命令')
+                                : null,
+                              setupInfo
+                                ? el('div', {
+                                    style: { marginTop: 6, padding: 6, background: '#0c1118', borderRadius: 4 },
+                                  },
+                                    el('div', { style: { fontSize: 11, opacity: 0.7, marginBottom: 4 } },
+                                      `粘到终端里跑（脚本 ${setupInfo.scriptExists ? '已随包提供' : '缺失！'}）：`),
+                                    el('div', {
+                                      style: {
+                                        ...styles.mono, fontSize: 10.5,
+                                        whiteSpace: 'pre-wrap', wordBreak: 'break-all',
+                                      },
+                                    }, setupInfo.check),
+                                    el('button', {
+                                      style: { ...styles.btn, marginTop: 4, padding: '1px 8px', fontSize: 10.5 },
+                                      onClick: () => {
+                                        try { navigator.clipboard.writeText(setupInfo.check) } catch { /* 忽略 */ }
+                                      },
+                                    }, '复制命令'),
+                                    el('div', { style: { fontSize: 10.5, opacity: 0.6, marginTop: 3 } },
+                                      '默认只检查；加 -Apply 才会动手，而且只做脚本 / TripoSR 源码 / 权重。'),
+                                  )
+                                : null,
+                            )
+                          : null,
                         el('div', { style: { fontSize: 12, fontWeight: 600, margin: '10px 0 6px' } }, '建模 AI 适配情况'),
                         el('div', { style: { display: 'flex', flexDirection: 'column', gap: 5 } },
                           env.recommendations.map((r) => {

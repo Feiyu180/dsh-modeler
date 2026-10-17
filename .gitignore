@@ -28,3 +28,7 @@ desktop.ini
 # 这样 clone 下来直接 `node build/build.mjs` 就能构建，不用先 npm install。
 # 若你更希望走标准依赖管理，把下面这行的注释去掉，并在 README 里补 npm install 步骤。
 # node_modules/
+
+# Python 字节码（跑 py_compile 会生成）
+__pycache__/
+*.pyc

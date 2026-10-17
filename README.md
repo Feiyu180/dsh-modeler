@@ -98,6 +98,8 @@ build/smoke-client.mjs  产物静态冒烟（假 __ModuleLoader__ + vm 执行）
 install.ps1             装进 DSH profile（幂等，可 -Uninstall）
 tools/                  全部验证脚本（见 §5）
 tools/host-harness.mjs  host 端点测试台（不等重启也能测 /install、/environment）
+tools/ai/               各模型的 Python 调用脚本（随包发布；路径可用环境变量覆盖）
+tools/setup-env.ps1     AI 运行环境向导（默认只检查，-Apply 只做安全步骤）
 samples/                24 张三视图夹具（box/sphere/cylinder/cone/lshape/torus/asym/tiny）
 ```
 
