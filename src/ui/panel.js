@@ -1663,20 +1663,36 @@ export function createModelerPanel(React, hooks = {}) {
                               // 已就绪的也给一个「校验/重装」—— 逐个核对精确字节数，只有缺的或
                               // 大小不符的才会真下载，健康的安装点一下就是几百毫秒的空转。
                               plan && (r.verdict === 'installable' || r.verdict === 'ready')
-                                ? el('button', {
-                                    style: {
-                                      ...styles.btn, marginLeft: 8, padding: '1px 8px', fontSize: 11,
-                                      ...(busyThis ? styles.btnOn : null),
-                                    },
-                                    disabled: !!installing,
-                                    title: r.verdict === 'ready'
-                                      ? `核对 ${plan.dir} 里的文件字节数，缺的/大小不符的才会下载（共 ${plan.totalGB} GiB，`
-                                        + '支持断点续传）'
-                                      : `下载到 ${plan.dir}（${plan.totalGB} GiB，`
-                                        + `${plan.steps.length} 个文件，支持断点续传；已下好的会跳过）`,
-                                    onClick: () => runInstall(r.id),
-                                  }, busyThis ? '下载中…'
-                                    : r.verdict === 'ready' ? '校验/重装' : `一键安装 ${plan.totalGB}G`)
+                                ? (() => {
+                                    // ⚠ 一键安装**只下载权重文件**，不含 Python 环境 / ComfyUI / 推理脚本。
+                                    //   所以缺运行时（python、推理脚本）时不给下载按钮 —— 否则用户会先下
+                                    //   9~14 GiB 才发现根本跑不了，这是最糟的体验。判据来自 host 的 missing 标签。
+                                    const rt = (Array.isArray(r.missing) ? r.missing : [])
+                                      .filter((m) => /python|脚本|comfyui/i.test(m)
+                                        && !/权重|ckpt|safetensors/i.test(m))
+                                    if (rt.length) {
+                                      return el('span', {
+                                        style: { marginLeft: 8, fontSize: 11, color: '#ffd479', cursor: 'help' },
+                                        title: `缺运行时：${rt.join('；')}。一键安装只下载权重文件，`
+                                          + '不含 Python 环境与推理脚本；请先按 README 第 2 节备好运行环境。',
+                                      }, '先备运行环境')
+                                    }
+                                    return el('button', {
+                                      style: {
+                                        ...styles.btn, marginLeft: 8, padding: '1px 8px', fontSize: 11,
+                                        ...(busyThis ? styles.btnOn : null),
+                                      },
+                                      disabled: !!installing,
+                                      title: (r.verdict === 'ready'
+                                        ? `核对 ${plan.dir} 里的文件字节数，缺的/大小不符的才会下载（共 ${plan.totalGB} GiB，`
+                                          + '支持断点续传）'
+                                        : `下载到 ${plan.dir}（${plan.totalGB} GiB，`
+                                          + `${plan.steps.length} 个文件，支持断点续传；已下好的会跳过）`)
+                                        + '；仅下载权重文件，不含 Python 环境 / 推理脚本。',
+                                      onClick: () => runInstall(r.id),
+                                    }, busyThis ? '下载中…'
+                                      : r.verdict === 'ready' ? '校验/重装' : `一键安装 ${plan.totalGB}G`)
+                                  })()
                                 : null,
                               jb
                                 ? el('div', { style: { marginTop: 3 } },
