@@ -2,6 +2,12 @@
   "name": "dsh-modeler",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Feiyu180/dsh-modeler.git"
+  },
+  "homepage": "https://github.com/Feiyu180/dsh-modeler#readme",
   "description": "DeepSeek Harness 插件：三视图（前/侧/俯）建模。把三张正交视图的剪影做体素雕刻 + Chamfer 距离场 + Naive Surface Nets 对偶等值面重建，得到水密三维网格，可在 DSH 面板里用 three.js 实时预览并导出 OBJ / STL / GLB。",
   "keywords": ["dsh", "dsh-plugin", "deepseek-harness", "three.js", "3d", "modeling", "orthographic", "voxel", "surface-nets"],
   "type": "module",

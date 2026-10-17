@@ -13,6 +13,42 @@
 
 ---
 
+## 安装
+
+三种方式任选其一。**装完必须重启 DSH** —— host 半边的 3 个工具与 `/environment`、`/setup-env`
+等端点只有重启才注册；客户端半边会热重载，不用刷新也能拿到新面板。
+
+| 方式 | 怎么操作 | 说明 |
+|---|---|---|
+| **本地目录（最稳）** | DSH → 插件 → 添加插件 → 粘本目录的绝对路径 | 不联网、不受网络影响 |
+| GitHub 仓库地址 | 粘 `https://github.com/Feiyu180/dsh-modeler` | 国内网络对 GitHub 的 git 传输经常不稳；建议先 clone 再用上面那条 |
+| 命令行 | `powershell -ExecutionPolicy Bypass -File install.ps1` | 等价于手动版；**和安装对话框二选一**，别重复做（会重复插条目） |
+
+装完刷新页面，左侧栏底部「设置」上方会出现 **◧ 三视图建模**。
+
+### 装完 AI 是「缺项」状态，这是正常的
+
+本插件把「三视图建模」和「AI 后端」彻底分开：
+
+- **三视图建模**：纯 JS、零依赖、不联网 —— 装完立刻能用。
+- **AI 后端**：需要 Python / ComfyUI / 推理脚本等外部环境，仓库里**没有**；
+  而且默认路径是占位符（`D:\dsh-data\...`），要按自己的机器准备。
+
+怎么知道自己缺什么、要下什么：打开面板 →「环境与模型」→ **运行环境** 一栏会逐项列出
+（✓/✗ + 缺哪个文件 + 每项要下载的大小与来源）。也可以直接跑：
+
+```powershell
+# 只检查，什么都不改
+powershell -ExecutionPolicy Bypass -File tools\setup-env.ps1 -Check
+# 执行可自动化的部分（脚本复制 / TripoSR 源码 / 权重）
+powershell -ExecutionPolicy Bypass -File tools\setup-env.ps1 -Apply
+```
+
+ComfyUI 与 Python 环境脚本**不会代装**（体积大、失败点多、ComfyUI 是 GPL-3.0 不进本仓库），
+它只给出确切的下载命令和镜像地址，由你自己跑、看得见进度和报错。
+
+---
+
 ## 1. 怎么用
 
 ### 1.1 在 DSH 里用（主路径）
