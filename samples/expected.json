@@ -1,0 +1,306 @@
+{
+  "box": {
+    "front": {
+      "file": "box-front.png",
+      "width": 120,
+      "height": 60,
+      "area": 7200,
+      "bbox": [
+        0,
+        0,
+        119,
+        59
+      ]
+    },
+    "side": {
+      "file": "box-side.png",
+      "width": 40,
+      "height": 60,
+      "area": 2400,
+      "bbox": [
+        0,
+        0,
+        39,
+        59
+      ]
+    },
+    "top": {
+      "file": "box-top.png",
+      "width": 120,
+      "height": 40,
+      "area": 4800,
+      "bbox": [
+        0,
+        0,
+        119,
+        39
+      ]
+    }
+  },
+  "sphere": {
+    "front": {
+      "file": "sphere-front.png",
+      "width": 120,
+      "height": 120,
+      "area": 11304,
+      "bbox": [
+        0,
+        0,
+        119,
+        119
+      ]
+    },
+    "side": {
+      "file": "sphere-side.png",
+      "width": 120,
+      "height": 120,
+      "area": 11304,
+      "bbox": [
+        0,
+        0,
+        119,
+        119
+      ]
+    },
+    "top": {
+      "file": "sphere-top.png",
+      "width": 120,
+      "height": 120,
+      "area": 11304,
+      "bbox": [
+        0,
+        0,
+        119,
+        119
+      ]
+    }
+  },
+  "cylinder": {
+    "front": {
+      "file": "cylinder-front.png",
+      "width": 100,
+      "height": 140,
+      "area": 14000,
+      "bbox": [
+        0,
+        0,
+        99,
+        139
+      ]
+    },
+    "side": {
+      "file": "cylinder-side.png",
+      "width": 100,
+      "height": 140,
+      "area": 14000,
+      "bbox": [
+        0,
+        0,
+        99,
+        139
+      ]
+    },
+    "top": {
+      "file": "cylinder-top.png",
+      "width": 100,
+      "height": 100,
+      "area": 7868,
+      "bbox": [
+        0,
+        0,
+        99,
+        99
+      ]
+    }
+  },
+  "cone": {
+    "front": {
+      "file": "cone-front.png",
+      "width": 100,
+      "height": 140,
+      "area": 7052,
+      "bbox": [
+        0,
+        0,
+        99,
+        139
+      ]
+    },
+    "side": {
+      "file": "cone-side.png",
+      "width": 100,
+      "height": 140,
+      "area": 7052,
+      "bbox": [
+        0,
+        0,
+        99,
+        139
+      ]
+    },
+    "top": {
+      "file": "cone-top.png",
+      "width": 100,
+      "height": 100,
+      "area": 7868,
+      "bbox": [
+        0,
+        0,
+        99,
+        99
+      ]
+    }
+  },
+  "lshape": {
+    "front": {
+      "file": "lshape-front.png",
+      "width": 120,
+      "height": 120,
+      "area": 8000,
+      "bbox": [
+        0,
+        0,
+        119,
+        119
+      ]
+    },
+    "side": {
+      "file": "lshape-side.png",
+      "width": 60,
+      "height": 120,
+      "area": 7200,
+      "bbox": [
+        0,
+        0,
+        59,
+        119
+      ]
+    },
+    "top": {
+      "file": "lshape-top.png",
+      "width": 40,
+      "height": 60,
+      "area": 2400,
+      "bbox": [
+        0,
+        0,
+        39,
+        59
+      ]
+    }
+  },
+  "torus-ish": {
+    "front": {
+      "file": "torus-ish-front.png",
+      "width": 120,
+      "height": 120,
+      "area": 11900,
+      "bbox": [
+        0,
+        0,
+        119,
+        119
+      ]
+    },
+    "side": {
+      "file": "torus-ish-side.png",
+      "width": 120,
+      "height": 30,
+      "area": 3600,
+      "bbox": [
+        0,
+        0,
+        119,
+        29
+      ]
+    },
+    "top": {
+      "file": "torus-ish-top.png",
+      "width": 120,
+      "height": 120,
+      "area": 11900,
+      "bbox": [
+        0,
+        0,
+        119,
+        119
+      ]
+    }
+  },
+  "asym": {
+    "front": {
+      "file": "asym-front.png",
+      "width": 140,
+      "height": 100,
+      "area": 10500,
+      "bbox": [
+        0,
+        0,
+        139,
+        99
+      ]
+    },
+    "side": {
+      "file": "asym-side.png",
+      "width": 60,
+      "height": 100,
+      "area": 6000,
+      "bbox": [
+        0,
+        0,
+        59,
+        99
+      ]
+    },
+    "top": {
+      "file": "asym-top.png",
+      "width": 140,
+      "height": 60,
+      "area": 8400,
+      "bbox": [
+        0,
+        0,
+        139,
+        59
+      ]
+    }
+  },
+  "tiny": {
+    "front": {
+      "file": "tiny-front.png",
+      "width": 6,
+      "height": 6,
+      "area": 36,
+      "bbox": [
+        97,
+        97,
+        102,
+        102
+      ]
+    },
+    "side": {
+      "file": "tiny-side.png",
+      "width": 6,
+      "height": 6,
+      "area": 36,
+      "bbox": [
+        97,
+        97,
+        102,
+        102
+      ]
+    },
+    "top": {
+      "file": "tiny-top.png",
+      "width": 6,
+      "height": 6,
+      "area": 36,
+      "bbox": [
+        97,
+        97,
+        102,
+        102
+      ]
+    }
+  }
+}

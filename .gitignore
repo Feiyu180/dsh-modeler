@@ -1,0 +1,30 @@
+# 排查/调试产物（本包已剔除，防止以后又跑测试时混进来）
+.tmp-*
+*.tmp
+_host-debug.log
+tools/_*.png
+tools/_*.json
+tools/*-test.html
+tools/preview.html
+tools/user-triptych-preview.html
+tools/_rev-*/
+*.stl
+*.obj
+
+# 这个脚本自己的替换表里必然写着本机用户名（那是它要替换的目标），所以只留本地、不进仓库。
+tools/anonymize-paths.ps1
+
+# 开发过程稿：探针脚本、审查脚本的产物、与外部模型的派单/回执 —— 都不是交付物
+tools/_*
+tools/wb-*
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+
+# 说明：build/node_modules（three + esbuild，12 MB）**是故意提交的** ——
+# 这样 clone 下来直接 `node build/build.mjs` 就能构建，不用先 npm install。
+# 若你更希望走标准依赖管理，把下面这行的注释去掉，并在 README 里补 npm install 步骤。
+# node_modules/

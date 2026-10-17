@@ -1,0 +1,33 @@
+{
+  "name": "dsh-modeler",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DeepSeek Harness 插件：三视图（前/侧/俯）建模。把三张正交视图的剪影做体素雕刻 + Chamfer 距离场 + Naive Surface Nets 对偶等值面重建，得到水密三维网格，可在 DSH 面板里用 three.js 实时预览并导出 OBJ / STL / GLB。",
+  "keywords": ["dsh", "dsh-plugin", "deepseek-harness", "three.js", "3d", "modeling", "orthographic", "voxel", "surface-nets"],
+  "type": "module",
+  "main": "src/host/index.js",
+  "exports": {
+    ".": "./src/host/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "engines": { "node": ">=20" },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "external": []
+    }
+  },
+  "scripts": {
+    "build": "node build/build.mjs",
+    "watch": "node build/build.mjs --watch",
+    "verify": "pwsh -NoProfile -ExecutionPolicy Bypass -File tools/verify-all.ps1",
+    "verify:fast": "pwsh -NoProfile -ExecutionPolicy Bypass -File tools/verify-all.ps1 -SkipSlow",
+    "install:plugin": "pwsh -NoProfile -ExecutionPolicy Bypass -File install.ps1",
+    "uninstall:plugin": "pwsh -NoProfile -ExecutionPolicy Bypass -File install.ps1 -Uninstall",
+    "restart:dsh": "pwsh -NoProfile -ExecutionPolicy Bypass -File restart-dsh.ps1"
+  }
+}

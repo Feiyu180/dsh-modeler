@@ -1,0 +1,82 @@
+{
+ "box": {
+  "expectedVoxels": 288000,
+  "grid": [
+   120,
+   60,
+   40
+  ],
+  "jsFilled": 288000,
+  "match": true
+ },
+ "sphere": {
+  "expectedVoxels": 1010088,
+  "grid": [
+   120,
+   120,
+   120
+  ],
+  "jsFilled": 1010088,
+  "match": true
+ },
+ "cylinder": {
+  "expectedVoxels": 712320,
+  "grid": [
+   86,
+   120,
+   86
+  ],
+  "jsFilled": 712320,
+  "match": true
+ },
+ "cone": {
+  "expectedVoxels": 285884,
+  "grid": [
+   86,
+   120,
+   86
+  ],
+  "jsFilled": 285884,
+  "match": true
+ },
+ "lshape": {
+  "expectedVoxels": 480000,
+  "grid": [
+   120,
+   120,
+   60
+  ],
+  "jsFilled": 480000,
+  "match": true
+ },
+ "torus-ish": {
+  "expectedVoxels": 1253000,
+  "grid": [
+   120,
+   120,
+   120
+  ],
+  "jsFilled": 1253000,
+  "match": true
+ },
+ "asym": {
+  "expectedVoxels": 394740,
+  "grid": [
+   120,
+   86,
+   51
+  ],
+  "jsFilled": 394740,
+  "match": true
+ },
+ "tiny": {
+  "expectedVoxels": 1728000,
+  "grid": [
+   120,
+   120,
+   120
+  ],
+  "jsFilled": 1728000,
+  "match": true
+ }
+}

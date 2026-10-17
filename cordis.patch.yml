@@ -1,0 +1,5 @@
+# dsh-modeler bundle 层：本包装进 profile 后自动生效。
+# id 固定为 modeler，后续 profile / --patch 层可按 id 覆盖本行配置。
+- insert:
+    - id: modeler
+      name: dsh-modeler

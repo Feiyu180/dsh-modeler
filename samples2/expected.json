@@ -1,0 +1,138 @@
+{
+  "lshape": {
+    "desc": "L 形柱（竖臂 40×120 + 底横条 120×40，沿 Z 挤出 60）",
+    "kind": "prism",
+    "files": {
+      "front": "lshape-front.png",
+      "side": "lshape-side.png",
+      "top": "lshape-top.png"
+    },
+    "views": {
+      "front": {
+        "file": "lshape-front.png",
+        "width": 120,
+        "height": 120,
+        "area": 8000,
+        "bbox": [
+          0,
+          0,
+          119,
+          119
+        ]
+      },
+      "side": {
+        "file": "lshape-side.png",
+        "width": 60,
+        "height": 120,
+        "area": 7200,
+        "bbox": [
+          0,
+          0,
+          59,
+          119
+        ]
+      },
+      "top": {
+        "file": "lshape-top.png",
+        "width": 120,
+        "height": 60,
+        "area": 7200,
+        "bbox": [
+          0,
+          0,
+          119,
+          59
+        ]
+      }
+    },
+    "verified": {
+      "carveGrid": [
+        120,
+        120,
+        60
+      ],
+      "stretched": false,
+      "genus": 0,
+      "eulerCharacteristic": 2,
+      "volume": 479096.587,
+      "expectedVolume": 480000,
+      "volumeDeviation": -0.001882,
+      "watertight": true,
+      "reprojectionIoU": {
+        "front": 1,
+        "side": 1,
+        "top": 1
+      },
+      "vertexCount": 43610,
+      "triangleCount": 87216
+    }
+  },
+  "torus-ish": {
+    "desc": "方管（方环横截面 120×120、壁厚 40、方孔 40×40，沿 Z 挤出 120）",
+    "kind": "tube",
+    "files": {
+      "front": "torus-ish-front.png",
+      "side": "torus-ish-side.png",
+      "top": "torus-ish-top.png"
+    },
+    "views": {
+      "front": {
+        "file": "torus-ish-front.png",
+        "width": 120,
+        "height": 120,
+        "area": 12800,
+        "bbox": [
+          0,
+          0,
+          119,
+          119
+        ]
+      },
+      "side": {
+        "file": "torus-ish-side.png",
+        "width": 120,
+        "height": 120,
+        "area": 14400,
+        "bbox": [
+          0,
+          0,
+          119,
+          119
+        ]
+      },
+      "top": {
+        "file": "torus-ish-top.png",
+        "width": 120,
+        "height": 120,
+        "area": 14400,
+        "bbox": [
+          0,
+          0,
+          119,
+          119
+        ]
+      }
+    },
+    "verified": {
+      "carveGrid": [
+        120,
+        120,
+        120
+      ],
+      "stretched": false,
+      "genus": 1,
+      "eulerCharacteristic": 0,
+      "volume": 1534928.362,
+      "expectedVolume": 1536000,
+      "volumeDeviation": -0.000698,
+      "watertight": true,
+      "reprojectionIoU": {
+        "front": 0.99705,
+        "side": 1,
+        "top": 1
+      },
+      "vertexCount": 101128,
+      "triangleCount": 202256
+    }
+  }
+}
