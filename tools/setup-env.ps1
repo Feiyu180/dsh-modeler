@@ -19,8 +19,8 @@ setup-env.ps1 —— AI 运行环境安装向导（默认**只检查**，-Apply 
 param(
   [switch]$Check,
   [switch]$Apply,
-  [string]$Root = 'D:\dsh-triposr',
-  [string]$ComfyRoot = 'D:\ComfyUI_windows_portable',
+  [string]$Root = 'D:\dsh-data\dsh-triposr',
+  [string]$ComfyRoot = 'D:\dsh-data\ComfyUI_windows_portable',
   [string]$Proxy = 'https://gh-proxy.com/',
   [string]$PipMirror = 'https://pypi.tuna.tsinghua.edu.cn/simple',
   [switch]$SkipWeights
