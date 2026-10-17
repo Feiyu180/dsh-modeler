@@ -656,6 +656,18 @@ function envChecklist() {
   const scriptMissing = AI_SCRIPT_REQUIRED.filter((n) => !fileExists(path.join(AI_SCRIPT_DIR, n)))
   const provs = describeProviders(providerPaths())
   const anyWeights = provs.some((p) => p.available)
+  const plans = listInstallPlans()
+
+  // 权重那项：把**还没装**的安装方案逐个列出来，体积用方案里的精确字节数换算
+  const weightNeed = provs
+    .filter((p) => !p.available)
+    .map((p) => plans.find((x) => x.id === p.id))
+    .filter(Boolean)
+    .map((pl) => ({
+      name: `${pl.label}，共 ${pl.totalGB} GiB（${pl.steps.length} 个文件）`,
+      from: 'ModelScope · 面板「一键安装」或 fastdl.py（断点续传）',
+    }))
+
   const items = [
     {
       id: 'scripts',
@@ -663,6 +675,8 @@ function envChecklist() {
       ok: scriptMissing.length === 0,
       detail: scriptMissing.length ? `缺 ${scriptMissing.join(' / ')}` : AI_SCRIPT_DIR,
       why: '各模型的调用脚本，随插件一起发布',
+      need: [],
+      note: '随包提供，复制到数据目录即可，不需要下载',
     },
     {
       id: 'comfy',
@@ -670,6 +684,10 @@ function envChecklist() {
       ok: fileExists(h.python) && fileExists(COMFY_ROOT),
       detail: fileExists(h.python) ? COMFY_ROOT : `缺 ${h.python}`,
       why: '脚本要 import comfy 与 comfy_extras，复用它的 ShapeVAE / DINOv2 实现',
+      need: [{
+        name: 'ComfyUI portable（自带 Python 与 torch，约 2 GB 量级，随版本变动）',
+        from: 'github.com/comfyanonymous/ComfyUI/releases · 国内加 https://gh-proxy.com/ 前缀',
+      }],
     },
     {
       id: 'triposr',
@@ -677,6 +695,20 @@ function envChecklist() {
       ok: fileExists(t.python) && fileExists(t.cwd),
       detail: fileExists(t.python) ? t.python : `缺 ${t.python}`,
       why: 'Python 3.11 + torch，TripoSR 单图模型用',
+      need: [
+        {
+          name: 'Python 3.11 嵌入式包（约 10 MB）',
+          from: 'python.org/ftp/python/3.11.9/python-3.11.9-embed-amd64.zip',
+        },
+        {
+          name: 'torch（CUDA 版，约 2.5 GB）',
+          from: 'PyPI / PyTorch 源 · 国内建议清华镜像 pypi.tuna.tsinghua.edu.cn/simple',
+        },
+        {
+          name: 'transformers / trimesh / pillow / numpy（约 200 MB）',
+          from: 'PyPI · 同上镜像',
+        },
+      ],
     },
     {
       id: 'weights',
@@ -684,6 +716,7 @@ function envChecklist() {
       ok: anyWeights,
       detail: anyWeights ? '至少一个后端已就绪' : '都还没装（可在下面一键安装）',
       why: '权重可以用一键安装下载，不需要手动找',
+      need: weightNeed,
     },
   ]
   return { ok: items.every((i) => i.ok), items, scriptsDir: AI_SCRIPT_DIR }

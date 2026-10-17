@@ -1679,6 +1679,24 @@ export function createModelerPanel(React, hooks = {}) {
                                   }, '?'),
                                 )),
                               ),
+                              // 缺项时**直接把"要下什么"摊出来**：名称 + 体积 + 下载源，
+                              // 不用点开命令、也不用去翻 README 才知道该准备什么。
+                              env.checklist.items.some((it) => !it.ok)
+                                ? el('div', { style: { marginTop: 6, fontSize: 11, opacity: 0.85 } },
+                                    el('div', { style: { fontWeight: 600, marginBottom: 3 } }, '缺什么 / 要下什么：'),
+                                    env.checklist.items.filter((it) => !it.ok).map((it) => el('div', {
+                                      key: it.id, style: { marginBottom: 4 },
+                                    },
+                                      el('div', null, `· ${it.label} —— ${it.detail}`),
+                                      it.note
+                                        ? el('div', { style: { paddingLeft: 10, opacity: 0.8 } }, it.note)
+                                        : null,
+                                      (it.need || []).map((n, i) => el('div', {
+                                        key: i, style: { paddingLeft: 10, opacity: 0.8 },
+                                      }, `↳ 需下载 ${n.name}（${n.from}）`)),
+                                    )),
+                                  )
+                                : null,
                               el('div', { style: { marginTop: 5, fontSize: 11, opacity: 0.65 } },
                                 env.checklist.ok
                                   ? '运行环境齐了；权重在下面按模型安装即可。'
